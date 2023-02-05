@@ -88,7 +88,6 @@ class QImageViewer(QMainWindow):
 
     def createActions(self):
         self.openAct = QAction("Open...", self, shortcut="Ctrl+O", triggered=self.open)
-        self.exitAct = QAction("Exit", self, shortcut="Ctrl+Q", triggered=self.close)
         self.zoomInAct = QAction("Zoom In (25%)", self, shortcut="Ctrl++", enabled=False, triggered=self.zoomIn)
         self.zoomOutAct = QAction("Zoom Out (25%)", self, shortcut="Ctrl+-", enabled=False, triggered=self.zoomOut)
         self.normalSizeAct = QAction("Normal Size", self, shortcut="Ctrl+S", enabled=False, triggered=self.normalSize)
@@ -100,8 +99,6 @@ class QImageViewer(QMainWindow):
     def createMenus(self):
         self.fileMenu = QMenu("File", self)
         self.fileMenu.addAction(self.openAct)
-        self.fileMenu.addSeparator()
-        self.fileMenu.addAction(self.exitAct)
 
         self.viewMenu = QMenu("View", self)
         self.viewMenu.addAction(self.zoomInAct)
