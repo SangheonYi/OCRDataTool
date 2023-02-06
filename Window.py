@@ -2,13 +2,15 @@ from PyQt5.QtWidgets import QLabel, QHBoxLayout, QScrollArea, QMessageBox, QMain
 # from PySide2.QtCore import Qrect
 from TrainDataViewer import TrainDataViewer
 from PyQt5.QtCore import Qt
+import os
+from pathlib import Path
 fileName = "test.jpg"
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.scaleFactor = 0.0
-        self.logList = None
+        self.logList = []
         self.currentImageIndex = -1
 
         self.trainDataViewer = TrainDataViewer()
@@ -25,8 +27,13 @@ class MainWindow(QMainWindow):
         fileName, _ = QFileDialog.getOpenFileName(self, 'QFileDialog.getOpenFileName()', '',
                                                   "inference *.log", options=options)
         if fileName:
-            with open(fileName, 'r') as logFile:
-                self.logList = [line[:-1].split('\t') for line in logFile]
+            with open(fileName, 'r', encoding='utf-8') as logFile:
+                rawLogList = logFile.readlines()
+                for idx in range(len(rawLogList) // 5):
+                    log4Lines =  rawLogList[5 * idx : 5 * (idx + 1)]
+                    croppedPath = log4Lines[0][:-1].split('path: ')[1]
+                    logGt = ''.join(log4Lines[1:])
+                    self.logList.append((croppedPath, logGt))
             self.nextImage()
             self.scaleFactor = 1.0
 
@@ -72,20 +79,27 @@ class MainWindow(QMainWindow):
     # trigger methods
     def openImage(self):
         croppedPath, gt = self.logList[self.currentImageIndex]
-        boxedPath = croppedPath.replace('cropped', 'boxed')
-        self.trainDataViewer.setNewImage(boxedPath, croppedPath, gt)
+        croppedPath = Path(croppedPath)
+        boxedPageIdx = int(Path(croppedPath).stem.split('_')[0])
+        boxedDir = Path(str(croppedPath.parent).replace('cropped', 'boxed'))
+        boxedPath = list(boxedDir.iterdir())[boxedPageIdx]
+        
+        # print(os.path.exists(croppedPath))
+        # print(boxedPath, croppedPath)
+
+        self.trainDataViewer.setNewImage(str(boxedPath), str(croppedPath), gt)
 
     def nextImage(self):
-        print("next img", self.currentImageIndex)
         if self.currentImageIndex + 1 < len(self.logList):
             self.currentImageIndex += 1
-        self.openImage()
+            print("next img", self.currentImageIndex)
+            self.openImage()
 
     def prevImage(self):
-        print("prev img", self.currentImageIndex)
         if self.currentImageIndex - 1 >= 0:
             self.currentImageIndex -= 1
-        self.openImage()
+            print("prev img", self.currentImageIndex)
+            self.openImage()
 
 
 

@@ -26,7 +26,7 @@ class BoxedImageViewer(QWidget):
 
     def setNewImage(self, imagePath):
         self.imageLabel.setPixmap(QPixmap(imagePath))
-        self.imageLabel.adjustSize()
+        # self.imageLabel.adjustSize()
 
 class CroppedImageViewer(QWidget):
     def __init__(self):
@@ -50,7 +50,7 @@ class CroppedImageViewer(QWidget):
 
     def setNewImage(self, imagePath, gt):
         self.imageLabel.setPixmap(QPixmap(imagePath))
-        self.imageLabel.adjustSize()
+        # self.imageLabel.adjustSize()
         self.imageInferenceLabel.setText(gt)
 
 class TrainDataViewer(QWidget):
