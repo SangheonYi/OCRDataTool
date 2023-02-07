@@ -1,9 +1,8 @@
-from PyQt5.QtWidgets import QLabel, QHBoxLayout, QScrollArea, QMessageBox, QMainWindow, QMenu, QAction, qApp, QFileDialog, QWidget, QSplitter
-# from PySide2.QtCore import Qrect
+from PyQt6.QtWidgets import QMainWindow, QMenu, QFileDialog
 from TrainDataViewer import TrainDataViewer
-from PyQt5.QtCore import Qt
-import os
+from PyQt6.QtGui import QAction
 from pathlib import Path
+from PyQt6.QtCore import pyqtSlot, Qt
 fileName = "test.jpg"
 
 class MainWindow(QMainWindow):
@@ -12,6 +11,7 @@ class MainWindow(QMainWindow):
         self.scaleFactor = 0.0
         self.logList = []
         self.currentImageIndex = -1
+        self.viewPathBool = False
 
         self.trainDataViewer = TrainDataViewer()
         self.setCentralWidget(self.trainDataViewer)
@@ -19,13 +19,10 @@ class MainWindow(QMainWindow):
         self.createActions()
         self.createMenus()
         self.setWindowTitle("Image Viewer")
-        self.resize(800, 600)
-
+        self.resize(1900, 1600)
+    @pyqtSlot()
     def open(self):
-        options = QFileDialog.Options()
-        # fileName = QFileDialog.getOpenFileName(self, "Open File", QDir.currentPath())
-        fileName, _ = QFileDialog.getOpenFileName(self, 'QFileDialog.getOpenFileName()', '',
-                                                  "inference *.log", options=options)
+        fileName, _ = QFileDialog.getOpenFileName(self, "Open logfile", ".", filter="inference *.log")
         if fileName:
             with open(fileName, 'r', encoding='utf-8') as logFile:
                 rawLogList = logFile.readlines()
@@ -39,9 +36,6 @@ class MainWindow(QMainWindow):
 
             self.fitToWindowAct.setEnabled(True)
             self.updateActions()
-
-            # if not self.fitToWindowAct.isChecked():
-            #     self.imageLabel.adjustSize()
 
     def createMenus(self):
         self.fileMenu = QMenu("File", self)
@@ -69,10 +63,13 @@ class MainWindow(QMainWindow):
 
     def keyPressEvent(self, event):
         key=event.key()
-        if key==Qt.Key_Right:
+        if key==Qt.Key.Key_Right.value:
             self.nextImage()
-        elif key==Qt.Key_Left:
+        elif key==Qt.Key.Key_Left.value:
             self.prevImage()
+        if key==Qt.Key.Key_P.value:
+            self.viewPathBool = not self.viewPathBool
+            self.trainDataViewer.croppedImageViewer.setNewText(self.viewPathBool)
         else:
             print(event)
 
@@ -82,12 +79,10 @@ class MainWindow(QMainWindow):
         croppedPath = Path(croppedPath)
         boxedPageIdx = int(Path(croppedPath).stem.split('_')[0])
         boxedDir = Path(str(croppedPath.parent).replace('cropped', 'boxed'))
-        boxedPath = sorted(list(boxedDir.iterdir()))[boxedPageIdx]
-        
-        # print(os.path.exists(croppedPath))
-        # print(boxedPath, croppedPath)
-
-        self.trainDataViewer.setNewImage(str(boxedPath), str(croppedPath), gt)
+        boxedPath = sorted([str(itered_path) for itered_path in boxedDir.iterdir()])[boxedPageIdx] # sort key 지정 안 해서 멋대로 정렬되면 페이지 잘못 매핑될 수
+        croppedPath = str(croppedPath)
+        gt = '\n'.join([gt, croppedPath, boxedPath])
+        self.trainDataViewer.setNewImage(boxedPath, croppedPath, gt, self.viewPathBool)
 
     def nextImage(self):
         if self.currentImageIndex + 1 < len(self.logList):
@@ -101,8 +96,6 @@ class MainWindow(QMainWindow):
             print("prev img", self.currentImageIndex)
             self.openImage()
 
-
-
     def zoomIn(self):
         self.scaleImage(1.25)
 
@@ -110,7 +103,6 @@ class MainWindow(QMainWindow):
         self.scaleImage(0.8)
 
     def normalSize(self):
-        # self.imageLabel.adjustSize()
         self.scaleFactor = 1.0
 
     def fitToWindow(self):
@@ -138,12 +130,11 @@ class MainWindow(QMainWindow):
         # scrollBar.setValue(int(factor * scrollBar.value()
                             #    + ((factor - 1) * scrollBar.pageStep() / 2)))
 
-
 if __name__ == '__main__':
     import sys
-    from PyQt5.QtWidgets import QApplication
+    from PyQt6.QtWidgets import QApplication
 
     app = QApplication(sys.argv)
     imageViewer = MainWindow()
     imageViewer.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

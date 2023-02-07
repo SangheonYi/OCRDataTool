@@ -1,7 +1,8 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QHBoxLayout, QVBoxLayout
-from PyQt5.QtWidgets import QLabel, QSizePolicy, QScrollArea, QMessageBox, QMainWindow, QMenu, QAction
-from PyQt5.QtGui import QImage, QPixmap, QPalette, QPainter
+from PyQt6.QtWidgets import QApplication, QWidget, QHBoxLayout, QVBoxLayout
+from PyQt6.QtWidgets import QLabel, QSizePolicy
+from PyQt6.QtGui import QPixmap, QImage
+from PIL import Image
 
 fileName = "test.jpg"
 
@@ -9,7 +10,7 @@ class BoxedImageViewer(QWidget):
     def __init__(self):
         super().__init__()
         self.imageLabel = QLabel()
-        self.imageLabel.setBackgroundRole(QPalette.Base)
+        # self.imageLabel.setBackgroundRole(QPalette.Base)
         self.imageLabel.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Ignored)
         self.imageLabel.setScaledContents(True)
 
@@ -25,18 +26,22 @@ class BoxedImageViewer(QWidget):
         self.setLayout(self.boxedImageLayout)
 
     def setNewImage(self, imagePath):
-        self.imageLabel.setPixmap(QPixmap(imagePath))
-        # self.imageLabel.adjustSize()
+        # cv2 image process -> convert QImage by https://stackoverflow.com/questions/71141162/unable-to-display-image-in-my-pyqt-program
+        newImage = QPixmap(imagePath)
+        self.imageLabel.setPixmap(newImage)
+        self.imageLabel.adjustSize()
 
 class CroppedImageViewer(QWidget):
     def __init__(self):
         super().__init__()
 
         self.imageLabel = QLabel()
-        self.imageLabel.setBackgroundRole(QPalette.Base)
+        # self.imageLabel.setBackgroundRole(QPalette.Base)
         self.imageLabel.setScaledContents(True)
+        self.imageLabel.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Ignored)
         self.imageInferenceLabel = QLabel("please, open inference log file ", self)
-
+        self.imagePaths = ''
+        self.imageInferenceText = ''
         # TODO add scroll
         # self.scrollArea = QScrollArea()
         # self.scrollArea.setBackgroundRole(QPalette.Dark)
@@ -48,11 +53,18 @@ class CroppedImageViewer(QWidget):
         self.croppedImageLayout.addWidget(self.imageInferenceLabel)
         self.setLayout(self.croppedImageLayout)
 
-    def setNewImage(self, imagePath, gt):
+    def setNewImage(self, imagePath, text, viewPathBool):
         self.imageLabel.setPixmap(QPixmap(imagePath))
-        # self.imageLabel.adjustSize()
-        self.imageInferenceLabel.setText(gt)
+        self.imageLabel.adjustSize()
+        self.imageInferenceText, self.imagePaths = text.split('\n\n')
+        self.setNewText(viewPathBool)
 
+    def setNewText(self, viewPathBool):
+        text = self.imageInferenceText
+        if viewPathBool:
+            text = '\n\n'.join([self.imageInferenceText, self.imagePaths])
+        self.imageInferenceLabel.setText(text)
+    
 class TrainDataViewer(QWidget):
     def __init__(self) -> None:
         super().__init__()
@@ -66,13 +78,14 @@ class TrainDataViewer(QWidget):
         self.mainLayout.addWidget(self.boxedImageViewer)
         self.setLayout(self.mainLayout)
 
-    def setNewImage(self, boxedPath, croppedPath, gt):
+    def setNewImage(self, boxedPath, croppedPath, gt, viewPathBool):
         self.boxedImageViewer.setNewImage(boxedPath)
-        self.croppedImageViewer.setNewImage(croppedPath, gt)
+        self.croppedImageViewer.setNewImage(croppedPath, gt, viewPathBool)
+
 
 if __name__ == '__main__':
     import sys
-    from PyQt5.QtWidgets import QApplication
+    from PyQt6.QtWidgets import QApplication
 
     app = QApplication(sys.argv)
 
@@ -87,4 +100,4 @@ if __name__ == '__main__':
     # trainDataViewer = TrainDataViewer()
     # trainDataViewer.setNewImage(fileName, fileName, "GT: \nresult")
     # trainDataViewer.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
