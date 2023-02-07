@@ -82,7 +82,7 @@ class MainWindow(QMainWindow):
         croppedPath = Path(croppedPath)
         boxedPageIdx = int(Path(croppedPath).stem.split('_')[0])
         boxedDir = Path(str(croppedPath.parent).replace('cropped', 'boxed'))
-        boxedPath = list(boxedDir.iterdir())[boxedPageIdx]
+        boxedPath = sorted(list(boxedDir.iterdir()))[boxedPageIdx]
         
         # print(os.path.exists(croppedPath))
         # print(boxedPath, croppedPath)
