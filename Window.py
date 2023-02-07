@@ -3,7 +3,6 @@ from TrainDataViewer import TrainDataViewer
 from PyQt6.QtGui import QAction
 from pathlib import Path
 from PyQt6.QtCore import pyqtSlot, Qt
-fileName = "test.jpg"
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -53,8 +52,6 @@ class MainWindow(QMainWindow):
 
     def createActions(self):
         self.openAct = QAction("Open...", self, shortcut="Ctrl+O", triggered=self.open)
-        self.nextImageAct = QAction("Next image", self, shortcut="Right", triggered=self.nextImage)
-        self.prevImageAct = QAction("Previous image", self, shortcut="Left", triggered=self.prevImage)
         self.zoomInAct = QAction("Zoom In (25%)", self, shortcut="Ctrl++", enabled=False, triggered=self.zoomIn)
         self.zoomOutAct = QAction("Zoom Out (25%)", self, shortcut="Ctrl+-", enabled=False, triggered=self.zoomOut)
         self.normalSizeAct = QAction("Normal Size", self, shortcut="Ctrl+S", enabled=False, triggered=self.normalSize)
@@ -67,7 +64,9 @@ class MainWindow(QMainWindow):
             self.nextImage()
         elif key==Qt.Key.Key_Left.value:
             self.prevImage()
-        if key==Qt.Key.Key_P.value:
+        elif key==Qt.Key.Key_O.value:
+            self.trainDataViewer.croppedImageViewer.viewOutSourcing()
+        elif key==Qt.Key.Key_P.value:
             self.viewPathBool = not self.viewPathBool
             self.trainDataViewer.croppedImageViewer.setNewText(self.viewPathBool)
         else:

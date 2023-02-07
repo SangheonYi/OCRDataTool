@@ -3,6 +3,7 @@ from PyQt6.QtWidgets import QApplication, QWidget, QHBoxLayout, QVBoxLayout
 from PyQt6.QtWidgets import QLabel, QSizePolicy
 from PyQt6.QtGui import QPixmap, QImage
 from PIL import Image
+import os
 
 fileName = "test.jpg"
 
@@ -65,6 +66,14 @@ class CroppedImageViewer(QWidget):
             text = '\n\n'.join([self.imageInferenceText, self.imagePaths])
         self.imageInferenceLabel.setText(text)
     
+    def viewOutSourcing(self):
+        for img_path in self.imagePaths.strip().split('\n'):
+            print(img_path)
+            if os.path.exists(img_path):
+                print(f"\"{img_path}\"")
+                os.popen(f"cd \"{os.path.dirname(img_path)}\" && \"{os.path.basename(img_path)}\"")
+        
+
 class TrainDataViewer(QWidget):
     def __init__(self) -> None:
         super().__init__()
