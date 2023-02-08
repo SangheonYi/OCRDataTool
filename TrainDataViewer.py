@@ -3,11 +3,14 @@ from PyQt6.QtWidgets import QApplication, QWidget, QHBoxLayout, QVBoxLayout
 from PyQt6.QtWidgets import QLabel, QSizePolicy
 from PyQt6.QtGui import QPixmap, QImage
 from PyQt6.QtCore import Qt
-import numpy
+import numpy as np
 import os
 import cv2
+import json
+from pathlib import PureWindowsPath
 
 fileName = "test.jpg"
+detLabelFileName = 'det_train.txt'
 
 class BoxedImageViewer(QWidget):
     def __init__(self):
@@ -16,7 +19,8 @@ class BoxedImageViewer(QWidget):
         # self.imageLabel.setBackgroundRole(QPalette.Base)
         self.imageLabel.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Ignored)
         self.imageLabel.setScaledContents(True)
-
+        self.detLabel = dict()
+        self.parseDetLabel()
         # TODO add scroll
         # self.scrollArea = QScrollArea()
         # self.scrollArea.setBackgroundRole(QPalette.Dark)
@@ -28,16 +32,38 @@ class BoxedImageViewer(QWidget):
 
         self.setLayout(self.boxedImageLayout)
 
-    def setNewImage(self, imagePath):
+    def parseDetLabel(self):
+        with open(detLabelFileName, 'r', encoding='utf-8') as detLabelFile:
+            for line in detLabelFile:
+                key, val_list = line.replace('converted', 'boxed').strip('\n').split('\t')
+                key = str(PureWindowsPath(key))
+                val_list = json.loads(val_list)
+                boxes, txts = [], []
+                for bno in range(0, len(val_list)):
+                    box = val_list[bno]['points']
+                    txt = val_list[bno]['transcription']
+                    boxes.append(box)
+                    txts.append(txt)
+                self.detLabel[key] = {
+                    'boxes':boxes, 
+                    'txts':txts
+                }
+
+    def setNewImage(self, boxedPath, croppedIdx):
         # cv2 image process -> convert QImage by https://stackoverflow.com/questions/71141162/unable-to-display-image-in-my-pyqt-program
-        # pilImage = Image.open(imagePath)
+        # pilImage = Image.open(boxedPath)
         # qim = ImageQt(pilImage)
-        # newImage = QPixmap(imagePath)
-        stream = open(imagePath, "rb")
+        # newImage = QPixmap(boxedPath)
+        stream = open(boxedPath, "rb")
         bytes = bytearray(stream.read())
-        numpyarray = numpy.asarray(bytes, dtype=numpy.uint8)
+        numpyarray = np.asarray(bytes, dtype=np.uint8)
         bgrImage = cv2.imdecode(numpyarray, cv2.IMREAD_UNCHANGED)
-        newImage = self.convert_cv_qt(bgrImage)
+
+        # draw annotation
+        points = np.array(self.detLabel[boxedPath]['boxes'][croppedIdx])
+        lined_img = cv2.polylines(bgrImage, [points], True, (0, 255, 0), 2)
+
+        newImage = self.convert_cv_qt(lined_img)
         self.imageLabel.setPixmap(newImage)
         self.imageLabel.adjustSize()
 
@@ -120,7 +146,8 @@ class TrainDataViewer(QWidget):
         self.setLayout(self.mainLayout)
 
     def setNewImage(self, boxedPath, croppedPath, gt, viewPathBool):
-        self.boxedImageViewer.setNewImage(boxedPath)
+        croppedIdx = int(os.path.basename(croppedPath).split('_')[1])
+        self.boxedImageViewer.setNewImage(boxedPath, croppedIdx)
         self.croppedImageViewer.setNewImage(croppedPath, gt, viewPathBool)
 
 
