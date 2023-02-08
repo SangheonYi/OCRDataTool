@@ -1,8 +1,8 @@
 from PyQt6.QtWidgets import QMainWindow, QMenu, QFileDialog
 from TrainDataViewer import TrainDataViewer
 from PyQt6.QtGui import QAction
-from pathlib import Path
 from PyQt6.QtCore import pyqtSlot, Qt
+from pathlib import Path
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -69,6 +69,8 @@ class MainWindow(QMainWindow):
         elif key==Qt.Key.Key_P.value:
             self.viewPathBool = not self.viewPathBool
             self.trainDataViewer.croppedImageViewer.setNewText(self.viewPathBool)
+        elif key in [Qt.Key.Key_C.value, Qt.Key.Key_B.value]:
+            self.trainDataViewer.croppedImageViewer.copyToClipboard(key)
         else:
             print(event)
 
