@@ -6,6 +6,7 @@ from PyQt6 import uic
 from pathlib import Path
 
 form_class = uic.loadUiType("ocr_data_tool.ui")[0]
+cache_file_name = 'dataTool.cache'
 
 class MainWindow(QMainWindow, form_class):
     def __init__(self):
@@ -17,12 +18,12 @@ class MainWindow(QMainWindow, form_class):
         self.viewPathBool = False
         self.trainDataView = TrainDataView(self)
         self.setCentralWidget(self.imageTopSplitter)
-        self.imageTopSplitter.setSizes([400, 1200])
+        self.imageTopSplitter.setSizes([800, 1200])
 
         self.createActions()
         self.createMenus()
         self.setWindowTitle("Image View")
-        self.resize(1900, 1600)
+        self.resize(2000, 1000)
 
         # for debug
         fileName = 'parsed_inf.log'
@@ -49,6 +50,9 @@ class MainWindow(QMainWindow, form_class):
                     croppedPath = log4Lines[0][:-1].split('path: ')[1]
                     logGt = ''.join(log4Lines[1:])
                     self.logList.append((croppedPath, logGt))
+            if Path(cache_file_name).exists():
+                with open(cache_file_name, 'r', encoding='utf-8') as cache_file:
+                    self.currentImageIndex = int(cache_file.readline()) - 1
             self.nextImage()
             self.scaleFactor = 1.0
 
@@ -78,21 +82,29 @@ class MainWindow(QMainWindow, form_class):
                                       triggered=self.fitToWindow)
 
     def keyPressEvent(self, event):
-        key=event.key()
-        if key==Qt.Key.Key_Right.value:
+        key = event.key()
+        if key == Qt.Key.Key_Right.value:
             self.nextImage()
-        elif key==Qt.Key.Key_Left.value:
+        elif key == Qt.Key.Key_Left.value:
             self.prevImage()
-        elif key==Qt.Key.Key_O.value:
+        elif key == Qt.Key.Key_O.value:
             self.trainDataView.croppedImageView.viewOutSourcing()
-        elif key==Qt.Key.Key_P.value:
+        elif key == Qt.Key.Key_P.value:
             self.viewPathBool = not self.viewPathBool
             self.trainDataView.croppedImageView.setNewText(self.viewPathBool)
         elif key in [Qt.Key.Key_C.value, Qt.Key.Key_B.value]:
             self.trainDataView.croppedImageView.copyToClipboard(key)
+        elif key == Qt.Key.Key_Return.value: # enter
+        # elif key == Qt.Key.Key_Enter.value: # num pad enter
+            self.idxJump()
         else:
             print(event)
 
+    def closeEvent(self, event) -> None:
+        with open(cache_file_name, 'w', encoding='utf-8') as cache_file:
+            cache_file.write(str(self.currentImageIndex))
+        return super().closeEvent(event)
+    
     # trigger methods
     def openImage(self):
         croppedPath, gt = self.logList[self.currentImageIndex]
@@ -123,6 +135,10 @@ class MainWindow(QMainWindow, form_class):
             self.currentImageIndex = len(self.logList) - 1
         print("prev img", self.currentImageIndex, len(self.logList))
         self.openImage()
+
+    def idxJump(self):
+        self.currentImageIndex = self.trainDataView.getCroppedImageIndex() - 1
+        self.nextImage()
 
     def zoomIn(self):
         self.scaleImage(1.25)

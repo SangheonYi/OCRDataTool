@@ -123,6 +123,9 @@ class CroppedImageView():
 
     def setImageIndex(self, idx):
         self.indexLineEdit.setText(str(idx))
+
+    def getImageIndex(self):
+        return int(self.indexLineEdit.text())
     
     def copyToClipboard(self, key):
         QApplication.clipboard().setText(self.imagePathDict[key])
@@ -150,7 +153,10 @@ class TrainDataView():
         croppedImg = self.boxedImageView.setNewImage(boxedPath, croppedIdx)
         self.croppedImageView.setNewImage(croppedImg, gt, viewPathBool)
         self.croppedImageView.setImageIndex(currentImageIndex)
-
+    
+    def getCroppedImageIndex(self):
+        return self.croppedImageView.getImageIndex()
+    
 if __name__ == '__main__':
     import sys
     from PyQt6.QtWidgets import QApplication
