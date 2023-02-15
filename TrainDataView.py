@@ -1,5 +1,5 @@
 import sys
-from PyQt6.QtWidgets import QApplication, QWidget
+from PyQt6.QtWidgets import QApplication, QWidget, QLineEdit
 from PyQt6.QtWidgets import QLabel, QSizePolicy
 from PyQt6.QtGui import QPixmap, QImage
 from PyQt6.QtCore import Qt
@@ -51,10 +51,6 @@ class BoxedImageView(QWidget):
                 }
 
     def setNewImage(self, boxedPath, croppedIdx):
-        # cv2 image process -> convert QImage by https://stackoverflow.com/questions/71141162/unable-to-display-image-in-my-pyqt-program
-        # pilImage = Image.open(boxedPath)
-        # qim = ImageQt(pilImage)
-        # newImage = QPixmap(boxedPath)
         stream = open(boxedPath, "rb")
         bytes = bytearray(stream.read())
         numpyarray = np.asarray(bytes, dtype=np.uint8)
@@ -83,7 +79,7 @@ class BoxedImageView(QWidget):
         return QPixmap.fromImage(convert_to_Qt_format)
 
 class CroppedImageView():
-    def __init__(self, imageLabel:QLabel, imageInferenceLabel :QLabel):
+    def __init__(self, imageLabel:QLabel, imageInferenceLabel :QLabel, indexLineEdit: QLineEdit):
 
         self.imageLabel = imageLabel
         # self.imageLabel.setBackgroundRole(QPalette.Base)
@@ -93,6 +89,8 @@ class CroppedImageView():
         self.imageInferenceLabel.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         self.imagePaths = ''
         self.imageInferenceText = ''
+
+        self.indexLineEdit = indexLineEdit
         # TODO add scroll
         # self.scrollArea = QScrollArea()
         # self.scrollArea.setBackgroundRole(QPalette.Dark)
@@ -122,6 +120,9 @@ class CroppedImageView():
         if viewPathBool:
             text = '\n\n'.join([self.imageInferenceText, self.imagePaths])
         self.imageInferenceLabel.setText(text)
+
+    def setImageIndex(self, idx):
+        self.indexLineEdit.setText(str(idx))
     
     def copyToClipboard(self, key):
         QApplication.clipboard().setText(self.imagePathDict[key])
@@ -141,14 +142,14 @@ class CroppedImageView():
 
 class TrainDataView():
     def __init__(self, main_window) -> None:
-        
         self.boxedImageView = BoxedImageView(main_window.boxedImageLabel)
-        self.croppedImageView = CroppedImageView(main_window.croppedImageLabel, main_window.imageInferenceLabel)
+        self.croppedImageView = CroppedImageView(main_window.croppedImageLabel, main_window.imageInferenceLabel, main_window.imageIndexLineEdit)
 
-    def setNewImage(self, boxedPath, croppedPath, gt, viewPathBool):
+    def setNewImage(self, boxedPath, croppedPath, gt, viewPathBool, currentImageIndex):
         croppedIdx = int(os.path.basename(croppedPath).split('_')[1])
         croppedImg = self.boxedImageView.setNewImage(boxedPath, croppedIdx)
         self.croppedImageView.setNewImage(croppedImg, gt, viewPathBool)
+        self.croppedImageView.setImageIndex(currentImageIndex)
 
 if __name__ == '__main__':
     import sys

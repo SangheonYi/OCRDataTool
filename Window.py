@@ -42,13 +42,11 @@ class MainWindow(QMainWindow, form_class):
     def openLog(self):
         fileName, _ = QFileDialog.getOpenFileName(self, "Open logfile", ".", filter="inference *.log")
         if fileName:
-            pdfList = set()
             with open(fileName, 'r', encoding='utf-8') as logFile:
                 rawLogList = logFile.readlines()
                 for idx in range(len(rawLogList) // 5):
                     log4Lines =  rawLogList[5 * idx : 5 * (idx + 1)]
                     croppedPath = log4Lines[0][:-1].split('path: ')[1]
-                    pdfList.add(croppedPath.split('\\'))
                     logGt = ''.join(log4Lines[1:])
                     self.logList.append((croppedPath, logGt))
             self.nextImage()
@@ -108,19 +106,23 @@ class MainWindow(QMainWindow, form_class):
         boxedPath = sorted([str(itered_path) for itered_path in boxedDir.iterdir()])[boxedPageIdx] # sort key 지정 안 해서 멋대로 정렬되면 페이지 잘못 매핑될 수
         croppedPath = str(croppedPath)
         gt = '\n'.join([gt, croppedPath, boxedPath])
-        self.trainDataView.setNewImage(boxedPath, croppedPath, gt, self.viewPathBool)
+        self.trainDataView.setNewImage(boxedPath, croppedPath, gt, self.viewPathBool, self.currentImageIndex)
 
     def nextImage(self):
         if self.currentImageIndex + 1 < len(self.logList):
             self.currentImageIndex += 1
-            print("next img", self.currentImageIndex)
-            self.openImage()
+        else:
+            self.currentImageIndex = 0
+        print("next img", self.currentImageIndex, len(self.logList))
+        self.openImage()
 
     def prevImage(self):
-        if self.currentImageIndex - 1 >= 0:
+        if self.currentImageIndex > 0:
             self.currentImageIndex -= 1
-            print("prev img", self.currentImageIndex)
-            self.openImage()
+        else:
+            self.currentImageIndex = len(self.logList) - 1
+        print("prev img", self.currentImageIndex, len(self.logList))
+        self.openImage()
 
     def zoomIn(self):
         self.scaleImage(1.25)
