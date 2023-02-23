@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1085</width>
-    <height>597</height>
+    <height>676</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,8 +17,8 @@
    <widget class="QSplitter" name="imageTopSplitter">
     <property name="geometry">
      <rect>
-      <x>50</x>
-      <y>0</y>
+      <x>60</x>
+      <y>-10</y>
       <width>681</width>
       <height>491</height>
      </rect>
@@ -84,6 +84,13 @@
         <height>0</height>
        </size>
       </property>
+      <property name="font">
+       <font>
+        <pointsize>18</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
       <property name="frameShape">
        <enum>QFrame::Box</enum>
       </property>
@@ -97,7 +104,50 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QLineEdit" name="imageIndexLineEdit"/>
+     <widget class="QWidget" name="gridLayoutWidget">
+      <layout class="QGridLayout" name="filterGridLayout">
+       <item row="1" column="0">
+        <widget class="QLabel" name="gtMatchLabel">
+         <property name="text">
+          <string>GT match</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="imageIndexLabel">
+         <property name="text">
+          <string>image index(total: )</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QLineEdit" name="pdfIncludeLineEdit"/>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="gtIncludeLineEdit"/>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLineEdit" name="gtMatchLineEdit"/>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="gtIncludeLabel">
+         <property name="text">
+          <string>GT include</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="pdfIncludeLabel">
+         <property name="text">
+          <string>PDF include</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QLineEdit" name="imageIndexLineEdit"/>
+       </item>
+      </layout>
+     </widget>
     </widget>
     <widget class="QLabel" name="boxedImageLabel">
      <property name="text">

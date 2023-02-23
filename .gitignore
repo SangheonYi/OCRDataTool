@@ -5,3 +5,6 @@ dist
 boxed
 cropped
 *.log
+dataTool.cache
+det_train.txt
+install.bat
