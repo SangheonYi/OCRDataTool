@@ -5,9 +5,9 @@ from PyQt6.QtWidgets import QLabel, QSizePolicy
 from PyQt6.QtWidgets import QWidget
 import numpy as np
 from PyQt6.QtGui import QPixmap, QImage
+from debug_mode import debug_mode
 
-detLabelFileName = 'det_train.txt'
-detLabelFileName = 'det_label.log'
+detLabelFileName = 'inspect_inf_result\det_label.log'
 
 class BoxedImageView(QWidget):
     def __init__(self, imageLabel: QLabel):
@@ -30,10 +30,6 @@ class BoxedImageView(QWidget):
             for idx, line in enumerate(detLabelFile):
                 key, val_list = line.replace('converted', 'boxed').strip('\n').split('\t')
                 key = str(WindowsPath(key))
-                ## for debug
-                wsl_path = Path("Z:\home\sayi\workspace\OCR\TrainDataPreprocess\PDFPreprocess\\")
-                key = str(wsl_path.joinpath(key))
-                ### for debug
                 val_list = json.loads(val_list)
                 boxes, txts = [], []
                 for bno in range(0, len(val_list)):
@@ -45,10 +41,11 @@ class BoxedImageView(QWidget):
                     'boxes':boxes, 
                     'txts':txts
                 }
-                ## for debug
-                if idx > 4:
+                
+                if debug_mode and idx > 4:
                     break
-                ### for debug
+            if debug_mode:
+                print('detlabel size: ', len(self.detLabel.keys()))
 
     def setNewImage(self, boxedPath, croppedIdx):
         stream = open(boxedPath, "rb")

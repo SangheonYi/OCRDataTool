@@ -5,12 +5,12 @@ from PyQt6.QtCore import pyqtSlot, Qt
 from PyQt6 import uic
 from pathlib import Path
 from ocr_data_ui import Ui_MainWindow
+from debug_mode import debug_mode
 
-form_class = uic.loadUiType("ocr_data_tool.ui")[0]
+# form_class = uic.loadUiType("ocr_data_tool.ui")[0]
 cache_file_name = 'dataTool.cache'
-
-class MainWindow(QMainWindow, form_class):
-# class MainWindow(QMainWindow, Ui_MainWindow):
+# class MainWindow(QMainWindow, form_class):
+class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
@@ -29,22 +29,12 @@ class MainWindow(QMainWindow, form_class):
         self.setWindowTitle("Image View")
         self.resize(2000, 1000)
 
-        ## for debug
-        # fileName = 'parsed_inf.log'
-        # with open(fileName, 'r', encoding='utf-8') as logFile:
-        #     rawLogList = logFile.readlines()
-        #     for idx in range(len(rawLogList) // 5):
-        #         log4Lines =  rawLogList[5 * idx : 5 * (idx + 1)]
-        #         croppedPath = log4Lines[0][:-1].split('path: ')[1]
-        #         logGt = ''.join(log4Lines[1:])
-        #         self.logList.append((croppedPath, logGt))
-        #     self.notFilteredLogList = self.logList.copy()
-        # self.nextImage()
-        ### for debug
-
     @pyqtSlot()
     def openInfResult(self):
-        fileName, _ = QFileDialog.getOpenFileName(self, "Open logfile", ".", filter="inference *.log")
+        if debug_mode:
+            fileName = 'inspect_inf_result\parsed_inf.log'
+        else:
+            fileName, _ = QFileDialog.getOpenFileName(self, "Open logfile", ".", filter="inference *.log")
         if fileName:
             with open(fileName, 'r', encoding='utf-8') as logFile:
                 rawLogList = logFile.readlines()
@@ -56,7 +46,10 @@ class MainWindow(QMainWindow, form_class):
                 self.notFilteredLogList = self.logList.copy()
             if Path(cache_file_name).exists():
                 with open(cache_file_name, 'r', encoding='utf-8') as cache_file:
-                    self.currentImageIndex = int(cache_file.readline()) - 1
+                    cached_idx = int(cache_file.readline())
+                    if cached_idx >= len(self.logList):
+                        cached_idx = len(self.logList) -1 
+                    self.currentImageIndex = cached_idx - 1
             self.nextImage()
             self.scaleFactor = 1.0
 
