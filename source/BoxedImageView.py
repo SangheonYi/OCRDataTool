@@ -27,7 +27,7 @@ class BoxedImageView(QWidget):
 
     def parseDetLabel(self):
         with open(detLabelFileName, 'r', encoding='utf-8') as detLabelFile:
-            for idx, line in enumerate(detLabelFile):
+            for line in detLabelFile:
                 key, val_list = line.replace('converted', 'boxed').strip('\n').split('\t')
                 key = str(WindowsPath(key))
                 val_list = json.loads(val_list)
@@ -41,9 +41,6 @@ class BoxedImageView(QWidget):
                     'boxes':boxes, 
                     'txts':txts
                 }
-                
-                if debug_mode and idx > 4:
-                    break
             if debug_mode:
                 print('detlabel size: ', len(self.detLabel.keys()))
 

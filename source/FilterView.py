@@ -17,14 +17,15 @@ class FilterView():
         newLogList = []
         gtIncludeText = self.gtInclude.text()
         gtMatchText = self.gtMatch.text()
-        pdfIncludeText = self.pdfInclude.text()
-        isFiltered = len(gtIncludeText) > 0 or len(gtMatchText) > 0 or len(pdfIncludeText) > 0
+        pathIncludeText = self.pdfInclude.text()
+        isFiltered = len(gtIncludeText) > 0 or len(gtMatchText) > 0 or len(pathIncludeText) > 0
         if isFiltered:
             for log in logList:
+                path = log[0]
                 gt = log[1].split('gt:')[-1]
                 if (len(gtIncludeText) == 0 or gtIncludeText in gt) \
-                and (len(gtIncludeText) == 0 or gtMatchText in gt) \
-                and (len(gtIncludeText) == 0 or pdfIncludeText in gt):
+                and (len(gtMatchText) == 0 or gtMatchText in gt) \
+                and (len(pathIncludeText) == 0 or pathIncludeText in path):
                     newLogList.append(log)
             return newLogList, isFiltered
         return logList, isFiltered

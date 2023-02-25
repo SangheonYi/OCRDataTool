@@ -28,6 +28,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.createMenus()
         self.setWindowTitle("Image View")
         self.resize(2000, 1000)
+        if debug_mode:
+            self.openInfResult()
 
     @pyqtSlot()
     def openInfResult(self):
@@ -96,10 +98,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         croppedPath = Path(croppedPath)
         boxedPageIdx = int(Path(croppedPath).stem.split('_')[0])
         boxedDir = Path(str(croppedPath.parent).replace('cropped', 'boxed'))
-        ## for debug
-        # wsl_path = Path("Z:\home\sayi\workspace\OCR\TrainDataPreprocess\PDFPreprocess\\")
-        # boxedDir = wsl_path / Path(str(croppedPath.parent).replace('cropped', 'boxed'))
-        ### for debug 
+        if debug_mode:
+            wsl_path = Path("Z:\home\sayi\workspace\OCR\TrainDataPreprocess\PDFPreprocess\\")
+            boxedDir = wsl_path / Path(str(croppedPath.parent).replace('cropped', 'boxed'))
 
         boxedPath = sorted([str(itered_path) for itered_path in boxedDir.iterdir()])[boxedPageIdx] # sort key 지정 안 해서 멋대로 정렬되면 페이지 잘못 매핑될 수
         croppedPath = str(croppedPath)
