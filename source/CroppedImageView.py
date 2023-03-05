@@ -14,13 +14,6 @@ class CroppedImageView():
         self.imagePaths = ''
         self.imageInferenceText = ''
 
-        # TODO add scroll
-        # self.scrollArea = QScrollArea()
-        # self.scrollArea.setBackgroundRole(QPalette.Dark)
-        # self.scrollArea.setWidget(self.imageLabel)
-        # self.scrollArea.setVisible(False)
-
-    # def setNewImage(self, imagePath, text, viewPathBool):
     def setNewImage(self, croppedImg, text, viewPathBool):
         self.imageLabel.setPixmap(croppedImg)
         self.imageLabel.adjustSize()

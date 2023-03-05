@@ -6,7 +6,7 @@ from CroppedImageView import CroppedImageView
 
 class TrainDataView():
     def __init__(self, main_window) -> None:
-        self.boxedImageView = BoxedImageView(main_window.boxedImageLabel)
+        self.boxedImageView = BoxedImageView(main_window.boxedImageLabel, main_window.boxedImageScrollArea)
         self.croppedImageView = CroppedImageView(main_window.croppedImageLabel, main_window.imageInferenceLabel)
         self.filterView = FilterView(main_window.filterGridLayout)
 
@@ -21,5 +21,3 @@ class TrainDataView():
     
     def fileterLogList(self, logList):
         return self.filterView.filter(logList)
-
-    

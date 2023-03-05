@@ -1,16 +1,17 @@
 from PyQt6.QtWidgets import QMainWindow, QMenu, QFileDialog
 from TrainDataView import TrainDataView
-from PyQt6.QtGui import QAction
+from PyQt6.QtGui import QAction, QWheelEvent
 from PyQt6.QtCore import pyqtSlot, Qt
 from PyQt6 import uic
 from pathlib import Path
 from ocr_data_ui import Ui_MainWindow
 from debug_mode import debug_mode
 
-# form_class = uic.loadUiType("ocr_data_tool.ui")[0]
 cache_file_name = 'dataTool.cache'
-# class MainWindow(QMainWindow, form_class):
-class MainWindow(QMainWindow, Ui_MainWindow):
+
+form_class = uic.loadUiType("ocr_data_tool.ui")[0]
+class MainWindow(QMainWindow, form_class):
+# class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
@@ -71,6 +72,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def keyPressEvent(self, event):
         key = event.key()
+        print("key press", key)
         if key == Qt.Key.Key_Right.value:
             self.nextImage()
         elif key == Qt.Key.Key_Left.value:
@@ -86,6 +88,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.dataFilter()
         else:
             print(event)
+
+    def wheelEvent(self, wheelEvent:QWheelEvent):
+        wheelDirection = wheelEvent.angleDelta().y()
+        if wheelEvent.modifiers().value == Qt.Modifier.CTRL.value:
+            if wheelDirection > 0:
+                self.zoomIn()
+            elif wheelDirection < 0:
+                self.zoomOut()
 
     def closeEvent(self, event) -> None:
         with open(cache_file_name, 'w', encoding='utf-8') as cache_file:
@@ -127,6 +137,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.logList, isFiltered = self.trainDataView.fileterLogList(self.notFilteredLogList)
         self.currentImageIndex = -1 if isFiltered else self.trainDataView.getCroppedImageIndex() - 1
         self.nextImage()
+
+    def zoomIn(self):
+        self.trainDataView.boxedImageView.scaleImage(1.25)
+
+    def zoomOut(self):
+        self.trainDataView.boxedImageView.scaleImage(0.8)
 
 if __name__ == '__main__':
     import sys

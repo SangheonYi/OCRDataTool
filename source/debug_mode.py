@@ -1,1 +1,2 @@
-debug_mode = False
+debug_mode = True
+# debug_mode = False

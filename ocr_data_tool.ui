@@ -19,7 +19,7 @@
      <rect>
       <x>60</x>
       <y>-10</y>
-      <width>681</width>
+      <width>551</width>
       <height>491</height>
      </rect>
     </property>
@@ -149,10 +149,42 @@
       </layout>
      </widget>
     </widget>
-    <widget class="QLabel" name="boxedImageLabel">
-     <property name="text">
-      <string>boxed image view</string>
+    <widget class="QScrollArea" name="boxedImageScrollArea">
+     <property name="verticalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOn</enum>
      </property>
+     <property name="horizontalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOn</enum>
+     </property>
+     <property name="widgetResizable">
+      <bool>true</bool>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+     <widget class="QWidget" name="scrollAreaWidgetContents">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>52</width>
+        <height>462</height>
+       </rect>
+      </property>
+      <widget class="QLabel" name="boxedImageLabel">
+       <property name="geometry">
+        <rect>
+         <x>9</x>
+         <y>9</y>
+         <width>104</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>boxed image view</string>
+       </property>
+      </widget>
+     </widget>
     </widget>
    </widget>
   </widget>
