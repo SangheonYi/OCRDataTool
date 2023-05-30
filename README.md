@@ -22,6 +22,6 @@ gt:		중간보고회
 ```
 3. image index 탐색, 경로 copy 등 단축키 사용 가능
 4. 검수한 이미지 index 저장으로 이어서 검수 가능
-5. gt, pdf 명으로 필터링
+5. gt, image 경로로 필터링
 ![Untitled](https://github.com/SangheonYi/OCRDataTool/assets/16645988/21dd4aaa-ac22-4e96-b8ff-635cfde3c943)
 
